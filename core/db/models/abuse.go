@@ -29,8 +29,6 @@ func (am *AbuseModel) InsertAbuse(AbuseIDs []string) {
 		abjoin = abids[0]
 	}
 
-	//fmt.Println(abjoin)
-
 	query := fmt.Sprint("INSERT INTO abuseIDs (ab_id) VALUES ", abjoin)
 
 	qo, err := am.DB.ExcuteQuery(query)

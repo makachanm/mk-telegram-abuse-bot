@@ -57,6 +57,10 @@ func (dc *DatabaseCore) ExcuteQuery(query string) (sql.Result, error) {
 
 func (dc *DatabaseCore) GetDataFromQuery(query string) (*sql.Rows, error) {
 	qrw, qerr := dc.DBDriver.Query(query)
-	fmt.Println(qerr)
+	if qerr != nil {
+		log.Fatalf(qerr.Error())
+		qrw.Close()
+	}
+
 	return qrw, qerr
 }

@@ -50,8 +50,6 @@ func (ms *BotService) Execute(_ context.Context) {
 		AbuseIDs = append(AbuseIDs, eAbu.AbuseID)
 	}
 
-	fmt.Println(AbuseIDs)
-
 	def_up, def_rm := ms.AbuseStor.UpdateDiffrence(d)
 
 	if len(def_up) >= 1 {
