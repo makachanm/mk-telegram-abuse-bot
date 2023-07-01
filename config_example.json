@@ -1,0 +1,10 @@
+{
+    "tokens": {
+        "misskey_token": "YOUR_MISSKEY_TOKEN",
+        "telegram_token": "YOUR_TELEGRAM_TOKEN"
+    },
+
+    "instance_url": "https://YOUR_INSTANCE_URL",
+    "db_filename": "data.db",
+    "telegram_channelid": -0
+}
