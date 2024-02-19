@@ -1,26 +1,27 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type DatabaseCore struct {
-	DBDriver *sql.DB
+	DBDriver *sqlx.DB
 }
 
-func NewDatabaseCore(db *sql.DB) DatabaseCore {
+func NewDatabaseCore(db *sqlx.DB) DatabaseCore {
 	return DatabaseCore{DBDriver: db}
 }
 
-func StartDB(dbfile string) *sql.DB {
+func StartDB(dbfile string) *sqlx.DB {
 	var serr error
-	var sqldb *sql.DB
+	var sqldb *sqlx.DB
 
-	sqldb, serr = sql.Open("sqlite3", dbfile)
+	//sqldb, serr = sql.Open("sqlite3", dbfile)
+	sqldb, serr = sqlx.Open("sqlite3", dbfile)
 	if serr != nil {
 		log.Fatalf(serr.Error())
 		sqldb.Close()
@@ -43,24 +44,4 @@ func StartDB(dbfile string) *sql.DB {
 	fmt.Println("OK.")
 
 	return sqldb
-}
-
-func (dc *DatabaseCore) ExcuteQuery(query string) (sql.Result, error) {
-	pr, perr := dc.DBDriver.Prepare(query)
-	if perr != nil {
-		log.Fatalf(perr.Error())
-		pr.Close()
-	}
-
-	return pr.Exec()
-}
-
-func (dc *DatabaseCore) GetDataFromQuery(query string) (*sql.Rows, error) {
-	qrw, qerr := dc.DBDriver.Query(query)
-	if qerr != nil {
-		log.Fatalf(qerr.Error())
-		qrw.Close()
-	}
-
-	return qrw, qerr
 }

@@ -3,11 +3,14 @@ package dbmodels
 import (
 	"abusebot/core/db"
 	"fmt"
-	"strings"
 )
 
 type AbuseModel struct {
 	DB *db.DatabaseCore
+}
+
+type AbuseIDCtx struct {
+	AbuseID string `db:"ab_id"`
 }
 
 func NewAbuseModel(dbc *db.DatabaseCore) AbuseModel {
@@ -15,64 +18,59 @@ func NewAbuseModel(dbc *db.DatabaseCore) AbuseModel {
 }
 
 func (am *AbuseModel) InsertAbuse(AbuseIDs []string) {
-	var abids []string = make([]string, 0)
+	var abids []AbuseIDCtx = make([]AbuseIDCtx, 0)
 
 	for _, val := range AbuseIDs {
-		abids = append(abids, (`('` + val + `')`))
+		abids = append(abids, AbuseIDCtx{AbuseID: val})
 	}
 
-	var abjoin string
-
-	if len(abids) >= 1 {
-		abjoin = strings.Join(abids, ", ")
-	} else {
-		abjoin = abids[0]
-	}
-
-	query := fmt.Sprint("INSERT INTO abuseIDs (ab_id) VALUES ", abjoin)
-
-	qo, err := am.DB.ExcuteQuery(query)
+	qo, err := am.DB.DBDriver.NamedExec("INSERT INTO abuseIDs (ab_id) VALUES (:ab_id)", abids)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println("DB INSERTED ACTION: ", qo)
+	affectrow, _ := qo.RowsAffected()
+
+	fmt.Println("DB INSERTED ACTION: ", affectrow, "AFFECTED")
 }
 
 func (am *AbuseModel) DeleteAbuse(AbuseIDs []string) {
-	var abids []string = make([]string, 0)
+	var abids []AbuseIDCtx = make([]AbuseIDCtx, 0)
 
 	for _, val := range AbuseIDs {
-		abids = append(abids, (`'` + val + `'`))
+		abids = append(abids, AbuseIDCtx{AbuseID: val})
 	}
 
-	var abjoin string
+	//query := fmt.Sprint("DELETE FROM abuseIDs WHERE ab_id IN (", abjoin, ")")
 
-	if len(abids) >= 1 {
-		abjoin = strings.Join(abids, ", ")
-	} else {
-		abjoin = abids[0]
-	}
-
-	query := fmt.Sprint("DELETE FROM abuseIDs WHERE ab_id IN (", abjoin, ")")
-
-	qo, err := am.DB.ExcuteQuery(query)
+	qo, err := am.DB.DBDriver.NamedExec("DELETE FROM abuseIDs WHERE ab_id IN (:ab_id)", abids)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println("DB DELETED ACTION: ", qo)
+	affectrow, _ := qo.RowsAffected()
+
+	fmt.Println("DB DELETED ACTION: ", affectrow, " AFFECTED")
 }
 
 func (am *AbuseModel) GetAbuse() []string {
 	var result []string = make([]string, 0)
 
-	query := "SELECT ab_id FROM abuseIDs"
-
-	rows, err := am.DB.GetDataFromQuery(query)
+	qo, err := am.DB.DBDriver.Prepare("SELECT ab_id FROM abuseIDs")
 	if err != nil {
 		fmt.Println(err)
-		rows.Close()
+		return []string{}
+	}
+
+	rows, err := qo.Query()
+	if err != nil {
+		fmt.Println(err)
+		return []string{}
+	}
+
+	if err != nil {
+		fmt.Println(err)
+		rows.Scan()
 	}
 
 	var abuse_d string

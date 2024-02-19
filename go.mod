@@ -7,3 +7,5 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/reugn/go-quartz v0.7.0
 )
+
+require github.com/jmoiron/sqlx v1.3.5 // indirect

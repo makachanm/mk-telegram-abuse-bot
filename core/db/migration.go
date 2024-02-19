@@ -1,25 +1,26 @@
 package db
 
-import "database/sql"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
 type DBMigration struct {
-	DB *sql.DB
+	DB *sqlx.DB
 }
 
-func NewDBMigration(dp *sql.DB) DBMigration {
+func NewDBMigration(dp *sqlx.DB) DBMigration {
 	return DBMigration{DB: dp}
 }
 
+const Scheme = `CREATE TABLE IF NOT EXISTS abuseIDs ( 
+	ab_id varchar(255)
+)`
+
 func (dm *DBMigration) InitalizeTable() {
-	initQuery := `
-	CREATE TABLE IF NOT EXISTS abuseIDs ( 
-		ab_id varchar(255)
-	)`
-	_, err := dm.DB.Exec(initQuery)
+	_, err := dm.DB.Exec(Scheme)
 
 	if err != nil {
 		dm.DB.Close()
 		panic(err)
 	}
-	//defer dm.DB.Close()
 }

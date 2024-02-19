@@ -52,7 +52,7 @@ func (ms *BotService) Execute(_ context.Context) {
 
 	def_up, def_rm := ms.AbuseStor.UpdateDiffrence(d)
 
-	if len(def_up) >= 1 {
+	if len(def_up) > 0 {
 		ms.DBModel.InsertAbuse(def_up)
 		added_abs := ms.AbuseStor.FindAbuseFromID(d, def_up)
 		fmt.Println("UPDATED: ", added_abs)
@@ -60,7 +60,9 @@ func (ms *BotService) Execute(_ context.Context) {
 		for _, ctx := range added_abs {
 			ms.MessageChan <- MessageBuilder(ctx)
 		}
-	} else if len(def_rm) >= 1 {
+	}
+
+	if len(def_rm) > 0 {
 		ms.DBModel.DeleteAbuse(def_rm)
 	}
 }
